@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-import models
-import schemas
+from app import models
+from app import schemas
 
 # Purchase CRUD operations
 def get_purchase(db: Session, purchase_id: int):

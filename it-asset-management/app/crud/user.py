@@ -2,8 +2,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from typing import Optional
 from passlib.context import CryptContext
-import models
-import schemas
+from app import models
+from app import schemas
 
 # Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

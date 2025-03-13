@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from typing import Optional
-import models
-import schemas
+from app import models
+from app import schemas
 from .device import get_device
 
 # Device Assignment CRUD operations

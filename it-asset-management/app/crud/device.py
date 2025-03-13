@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from typing import Optional
-import models
-import schemas
+from app import models
+from app import schemas
 
 # Device CRUD operations
 def get_device(db: Session, device_id: int):

@@ -1,0 +1,35 @@
+# FastAPI and web server
+fastapi>=0.95.0
+uvicorn[standard]>=0.21.0
+pydantic>=1.10.7
+email-validator>=2.0.0
+crud>=0.0.1
+pydantic_settings>=0.3.0
+
+# Database
+sqlalchemy>=2.0.9
+psycopg2-binary>=2.9.6  # PostgreSQL driver
+alembic>=1.10.3  # Database migrations
+
+# Security
+python-jose[cryptography]>=3.3.0  # JWT tokens
+passlib[bcrypt]>=1.7.4  # Password hashing
+python-multipart>=0.0.6  # Form data parsing
+
+# Utilities
+python-dotenv>=1.0.0  # Environment variables
+requests>=2.28.2  # HTTP client
+tenacity>=8.2.2  # Retry library for database connections
+pydantic[email]>=1.10.7  # Email validation
+
+# Development tools
+pytest>=7.3.1
+pytest-cov>=4.1.0
+black>=23.3.0
+isort>=5.12.0
+flake8>=6.0.0
+mypy>=1.2.0
+
+# API documentation
+ujson>=5.7.0
+orjson>=3.8.10

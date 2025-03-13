@@ -1,7 +1,7 @@
 import os
-from pydantic import BaseSettings
-from typing import Optional
+from typing import List
 from functools import lru_cache
+from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     APP_NAME: str = "IT Asset Management API"
@@ -11,18 +11,31 @@ class Settings(BaseSettings):
     # Database settings
     DATABASE_URL: str = os.environ.get("DATABASE_URL", "postgresql://username:password@localhost/itassetmanagement")
     
-    # CORS settings
-    CORS_ORIGINS: list = ["*"]
+    # CORS settings - defaults to allow all
+    CORS_ORIGINS: List[str] = ["*"]
     
     # Security settings for future JWT implementation
     SECRET_KEY: str = os.environ.get("SECRET_KEY", "your-secret-key-for-development-only")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 1 day
     
-    class Config:
+    model_config = {
+        "env_file": ".env",
+        "env_file_encoding": "utf-8",
+    }
+
+    @classmethod
+    def load_env(cls):
         env_file = ".env"
-        env_file_encoding = "utf-8"
+        print(f"Looking for .env file at: {os.path.abspath(env_file)}")
+        if os.path.isfile(env_file):
+            print(f".env file found")
+        else:
+            print(f".env file not found")
+        return cls()
 
 @lru_cache()
 def get_settings():
-    return Settings()
+    settings = Settings.load_env()
+    print(f"Database URL from settings: {settings.DATABASE_URL}")
+    return settings

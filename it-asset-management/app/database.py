@@ -3,9 +3,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
+from app.core.config import Settings
 
-# Get database URL from environment variable or use a default for development
-DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://username:password@localhost/itassetmanagement")
+# Get settings
+settings = Settings()
+
+# Get database URL from Settings or use a default for development
+DATABASE_URL = settings.DATABASE_URL
+print(f"Database URL from database.py: {DATABASE_URL}")
 
 # Create SQLAlchemy engine
 engine = create_engine(DATABASE_URL)

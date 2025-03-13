@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func, desc
 from datetime import date, timedelta
-import models
+from app import models
 
 # Reports
 def get_devices_by_type_report(db: Session):
