@@ -20,6 +20,7 @@ import Login from './pages/Login';
 // Context
 import { AuthProvider } from './contexts/AuthContext';
 
+
 // Create React Query client
 const queryClient = new QueryClient({
   defaultOptions: {
