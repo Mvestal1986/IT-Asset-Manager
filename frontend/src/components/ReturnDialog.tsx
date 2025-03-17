@@ -3,6 +3,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, F
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useMutation, useQueryClient } from 'react-query';
 import { returnDevice } from '../api/assignments';
+import { Typography } from '@mui/material';
 
 interface ReturnDialogProps {
   open: boolean;
