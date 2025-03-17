@@ -20,6 +20,32 @@ interface TabPanelProps {
   value: number;
 }
 
+interface DeviceAssignment {
+  assignment_id: number;
+  device_id: number;
+  user_id: number;
+  device?: {
+    device_id: number;
+    serial_number: string;
+    device_name?: string;
+    device_type?: {
+      device_type_id: number;
+      type_name: string;
+    };
+  };
+  user?: {
+    user_id: number;
+    first_name: string;
+    last_name: string;
+  };
+  checkout_date: string;
+  expected_return_date?: string;
+  actual_return_date?: string;
+  checkout_condition?: string;
+  return_condition?: string;
+  notes?: string;
+}
+
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
 
@@ -51,7 +77,7 @@ const DeviceDetail = () => {
   const [retireDialogOpen, setRetireDialogOpen] = useState(false);
   const [assignDialogOpen, setAssignDialogOpen] = useState(false);
   const [returnDialogOpen, setReturnDialogOpen] = useState(false);
-  const [selectedAssignment, setSelectedAssignment] = useState(null);
+  const [selectedAssignment, setSelectedAssignment] = useState<DeviceAssignment | null>(null);
 
   const { data: device, isLoading, refetch } = useQuery(
     ['device', deviceId],
@@ -103,7 +129,7 @@ const DeviceDetail = () => {
     }
   };
 
-  const handleReturnClick = (assignment) => {
+  const handleReturnClick = (assignment: DeviceAssignment) => {
     setSelectedAssignment(assignment);
     setReturnDialogOpen(true);
   };

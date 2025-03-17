@@ -12,23 +12,52 @@ import { getUsers } from '../api/users';
 import AssignmentDialog from '../components/AssignmentDialog';
 import ReturnDialog from '../components/ReturnDialog';
 
+// Define interface for your assignment type
+interface DeviceAssignment {
+  assignment_id: number;
+  device_id: number;
+  user_id: number;
+  device?: {
+    device_id: number;
+    serial_number: string;
+    device_name?: string;
+    device_type?: {
+      device_type_id: number;
+      type_name: string;
+    };
+  };
+  user?: {
+    user_id: number;
+    first_name: string;
+    last_name: string;
+  };
+  checkout_date: string;
+  expected_return_date?: string;
+  actual_return_date?: string;
+  checkout_condition?: string;
+  return_condition?: string;
+  notes?: string;
+}
+
 const AssignmentList = () => {
-  const [pageSize, setPageSize] = useState(10);
-  const [page, setPage] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    pageSize: 10,
+    page: 0
+  });
   const [deviceFilter, setDeviceFilter] = useState('');
   const [userFilter, setUserFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('active'); // Default to active assignments
   const [assignDialogOpen, setAssignDialogOpen] = useState(false);
   const [returnDialogOpen, setReturnDialogOpen] = useState(false);
-  const [selectedAssignment, setSelectedAssignment] = useState(null);
+  const [selectedAssignment, setSelectedAssignment] = useState<DeviceAssignment | null>(null);
   
   const { data: assignments, isLoading, refetch } = useQuery(
-    ['assignments', page, pageSize, deviceFilter, userFilter, statusFilter],
+    ['assignments', paginationModel.page, paginationModel.pageSize, deviceFilter, userFilter, statusFilter],
     () => getAssignments({ 
-      skip: page * pageSize, 
-      limit: pageSize,
-      device_id: deviceFilter || undefined,
-      user_id: userFilter || undefined,
+      skip: paginationModel.page * paginationModel.pageSize, 
+      limit: paginationModel.pageSize,
+      device_id: deviceFilter ? parseInt(deviceFilter) : undefined,
+      user_id: userFilter ? parseInt(userFilter) : undefined,
       active_only: statusFilter === 'active'
     })
   );
@@ -51,7 +80,7 @@ const AssignmentList = () => {
     }
   };
 
-  const handleReturnClick = (event, assignment) => {
+  const handleReturnClick = (event: React.MouseEvent, assignment: DeviceAssignment) => {
     event.stopPropagation();
     setSelectedAssignment(assignment);
     setReturnDialogOpen(true);
@@ -136,6 +165,7 @@ const AssignmentList = () => {
     },
   ];
 
+  // Complete the component with the UI
   return (
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
@@ -163,7 +193,7 @@ const AssignmentList = () => {
             >
               <MenuItem value="">All Devices</MenuItem>
               {devices?.map((device) => (
-                <MenuItem key={device.device_id} value={device.device_id}>
+                <MenuItem key={device.device_id} value={device.device_id.toString()}>
                   {device.device_name || device.serial_number} ({device.device_type?.type_name})
                 </MenuItem>
               ))}
@@ -181,7 +211,7 @@ const AssignmentList = () => {
             >
               <MenuItem value="">All Users</MenuItem>
               {users?.map((user) => (
-                <MenuItem key={user.user_id} value={user.user_id}>
+                <MenuItem key={user.user_id} value={user.user_id.toString()}>
                   {user.first_name} {user.last_name}
                 </MenuItem>
               ))}
@@ -211,12 +241,10 @@ const AssignmentList = () => {
           getRowId={(row) => row.assignment_id}
           paginationMode="server"
           rowCount={1000} // We don't know the total count from the API
-          page={page}
-          pageSize={pageSize}
-          onPageChange={(newPage) => setPage(newPage)}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
           loading={isLoading}
-          disableSelectionOnClick
+          disableRowSelectionOnClick
           components={{
             LoadingOverlay: LinearProgress,
           }}

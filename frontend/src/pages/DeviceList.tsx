@@ -1,3 +1,4 @@
+// Import React and necessary types
 import React, { useState } from 'react';
 import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
@@ -11,24 +12,42 @@ import { getDevices } from '../api/devices';
 import { getDeviceTypes } from '../api/deviceTypes';
 import DeviceDialog from '../components/DeviceDialog';
 
+// Define interfaces for your device type
+interface Device {
+  device_id: number;
+  serial_number: string;
+  device_name?: string;
+  model?: string;
+  is_checked_out: boolean;
+  is_retired: boolean;
+  device_type?: {
+    device_type_id: number;
+    type_name: string;
+  };
+  warranty_expiration?: string;
+}
+
 const DeviceList = () => {
-  const [pageSize, setPageSize] = useState(10);
-  const [page, setPage] = useState(0);
+  // Replace separate pagination props with a combined model
+  const [paginationModel, setPaginationModel] = useState({
+    pageSize: 10,
+    page: 0
+  });
   const [searchTerm, setSearchTerm] = useState('');
   const [deviceTypeFilter, setDeviceTypeFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedDevice, setSelectedDevice] = useState(null);
+  const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   
   const navigate = useNavigate();
 
   const { data: devices, isLoading, refetch } = useQuery(
-    ['devices', page, pageSize, searchTerm, deviceTypeFilter, statusFilter],
+    ['devices', paginationModel.page, paginationModel.pageSize, searchTerm, deviceTypeFilter, statusFilter],
     () => getDevices({ 
-      skip: page * pageSize, 
-      limit: pageSize,
+      skip: paginationModel.page * paginationModel.pageSize, 
+      limit: paginationModel.pageSize,
       search: searchTerm || undefined,
-      device_type_id: deviceTypeFilter || undefined,
+      device_type_id: deviceTypeFilter ? parseInt(deviceTypeFilter) : undefined,
       is_checked_out: statusFilter === 'assigned' ? true : statusFilter === 'available' ? false : undefined,
       is_retired: statusFilter === 'retired' ? true : false,
     })
@@ -36,7 +55,7 @@ const DeviceList = () => {
 
   const { data: deviceTypes } = useQuery('deviceTypes', getDeviceTypes);
 
-  const handleDeviceClick = (deviceId) => {
+  const handleDeviceClick = (deviceId: number) => {
     navigate(`/devices/${deviceId}`);
   };
 
@@ -48,7 +67,7 @@ const DeviceList = () => {
     }
   };
 
-  const handleEditClick = (event, device) => {
+  const handleEditClick = (event: React.MouseEvent, device: Device) => {
     event.stopPropagation();
     setSelectedDevice(device);
     setDialogOpen(true);
@@ -149,7 +168,7 @@ const DeviceList = () => {
           >
             <MenuItem value="">All Types</MenuItem>
             {deviceTypes?.map((type) => (
-              <MenuItem key={type.device_type_id} value={type.device_type_id}>
+              <MenuItem key={type.device_type_id} value={type.device_type_id.toString()}>
                 {type.type_name}
               </MenuItem>
             ))}
@@ -178,16 +197,14 @@ const DeviceList = () => {
           getRowId={(row) => row.device_id}
           paginationMode="server"
           rowCount={1000} // We don't know the total count from the API, so we use a large number
-          page={page}
-          pageSize={pageSize}
-          onPageChange={(newPage) => setPage(newPage)}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
           loading={isLoading}
-          disableSelectionOnClick
+          disableRowSelectionOnClick
           components={{
             LoadingOverlay: LinearProgress,
           }}
-          onRowClick={(params) => handleDeviceClick(params.id)}
+          onRowClick={(params) => handleDeviceClick(params.id as number)}
           sx={{ '& .MuiDataGrid-row:hover': { cursor: 'pointer' } }}
         />
       </Paper>
