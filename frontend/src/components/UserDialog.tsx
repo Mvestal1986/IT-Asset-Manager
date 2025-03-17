@@ -3,6 +3,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, S
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useMutation, useQueryClient } from 'react-query';
 import { createUser, updateUser } from '../api/users';
+import { Typography } from '@mui/material';
 
 interface UserDialogProps {
   open: boolean;
@@ -205,3 +206,4 @@ const UserDialog = ({ open, onClose, user }: UserDialogProps) => {
 };
 
 export default UserDialog;
+export {};
