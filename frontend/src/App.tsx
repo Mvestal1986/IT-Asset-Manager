@@ -14,6 +14,7 @@ import DeviceList from './pages/DeviceList';
 import DeviceDetail from './pages/DeviceDetail';
 import UserList from './pages/UserList';
 import UserDetail from './pages/UserDetail';
+import CreateUser from './pages/CreateUser';
 import AssignmentList from './pages/AssignmentList';
 import Login from './pages/Login';
 
@@ -89,6 +90,7 @@ function App() {
                   <Route path="devices" element={<DeviceList />} />
                   <Route path="devices/:id" element={<DeviceDetail />} />
                   <Route path="users" element={<UserList />} />
+                  <Route path="users/create" element={<CreateUser />} />
                   <Route path="users/:id" element={<UserDetail />} />
                   <Route path="assignments" element={<AssignmentList />} />
                 </Route>

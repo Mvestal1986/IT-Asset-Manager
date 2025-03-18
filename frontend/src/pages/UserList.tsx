@@ -1,4 +1,3 @@
-// import React and necessary types
 import React, { useState } from 'react';
 import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
@@ -27,7 +26,6 @@ interface User {
 }
 
 const UserList = () => {
-  // Replace separate pagination props with a combined model
   const [paginationModel, setPaginationModel] = useState({
     pageSize: 10,
     page: 0
@@ -67,6 +65,10 @@ const UserList = () => {
     setDialogOpen(true);
   };
 
+  const handleCreateUser = () => {
+    navigate('/users/create');
+  };
+
   // Generate initials for the avatar
   const getInitials = (firstName: string | undefined, lastName: string | undefined): string => {
     return `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase();
@@ -81,7 +83,6 @@ const UserList = () => {
     return colors[userId % colors.length];
   };
 
-  // Rest of the component remains the same but with updated DataGrid props
   const columns: GridColDef[] = [
     { 
       field: 'avatar', 
@@ -100,12 +101,102 @@ const UserList = () => {
         </Avatar>
       ),
     },
-    // Other column definitions...
+    { 
+      field: 'name', 
+      headerName: 'Name', 
+      flex: 1,
+      valueGetter: (params) => `${params.row.first_name} ${params.row.last_name}`,
+    },
+    { field: 'username', headerName: 'Username', flex: 1 },
+    { field: 'email', headerName: 'Email', flex: 1.5 },
+    { 
+      field: 'status', 
+      headerName: 'Status', 
+      width: 120,
+      renderCell: (params) => (
+        params.row.is_active 
+          ? <Chip label="Active" color="success" size="small" />
+          : <Chip label="Inactive" color="error" size="small" />
+      ),
+    },
+    { 
+      field: 'role', 
+      headerName: 'Role', 
+      width: 120,
+      renderCell: (params) => (
+        params.row.is_admin 
+          ? <Chip label="Admin" color="primary" size="small" />
+          : <Chip label="User" variant="outlined" size="small" />
+      ),
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 120,
+      sortable: false,
+      renderCell: (params) => (
+        <Box>
+          <Tooltip title="View details">
+            <IconButton 
+              onClick={() => handleUserClick(params.row.user_id)}
+              size="small"
+            >
+              <Info />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Edit user">
+            <IconButton 
+              onClick={(e) => handleEditClick(e, params.row)}
+              size="small"
+            >
+              <Edit />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      ),
+    },
   ];
 
   return (
     <Box>
-      {/* Component JSX */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h4">Users</Typography>
+        <Button 
+          variant="contained" 
+          startIcon={<Add />}
+          onClick={handleCreateUser}
+        >
+          Add User
+        </Button>
+      </Box>
+
+      <Paper sx={{ p: 2, mb: 3 }}>
+        <Box display="flex" gap={2} flexWrap="wrap">
+          <TextField
+            label="Search"
+            variant="outlined"
+            size="small"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{ minWidth: 200, flex: 1 }}
+            placeholder="Search by name, username, or email"
+          />
+          <TextField
+            select
+            label="Status"
+            variant="outlined"
+            size="small"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            sx={{ minWidth: 150 }}
+          >
+            <MenuItem value="">All Status</MenuItem>
+            <MenuItem value="active">Active</MenuItem>
+            <MenuItem value="inactive">Inactive</MenuItem>
+          </TextField>
+        </Box>
+      </Paper>
+
       <Paper sx={{ height: 'calc(100vh - 250px)', width: '100%' }}>
         <DataGrid
           rows={users || []}
@@ -124,6 +215,12 @@ const UserList = () => {
           sx={{ '& .MuiDataGrid-row:hover': { cursor: 'pointer' } }}
         />
       </Paper>
+
+      <UserDialog 
+        open={dialogOpen} 
+        onClose={handleDialogClose} 
+        user={selectedUser}
+      />
     </Box>
   );
 };
