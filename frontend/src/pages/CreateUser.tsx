@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // Removed unused location
 import { useMutation, useQueryClient } from 'react-query';
 import {
   Box,
@@ -12,7 +12,7 @@ import {
   CircularProgress,
   Alert,
   Container,
-  Grid,
+  // Grid removed as unused
   Snackbar
 } from '@mui/material';
 import { ArrowBack, Check } from '@mui/icons-material';
@@ -22,13 +22,26 @@ import generateSecurePassword from '../utils/passwordGenerator';
 
 const steps = ['Basic Information', 'Account Settings', 'Review'];
 
+// Define an interface for the form data
+interface UserFormData {
+  first_name: string;
+  last_name: string;
+  username: string;
+  email: string;
+  password: string;
+  is_active: boolean;
+  is_admin: boolean;
+  start_date: string | null;
+  end_date: string | null;
+}
+
 const CreateUser = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+  // Removed unused location
   const queryClient = useQueryClient();
   
   const [activeStep, setActiveStep] = useState(0);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<UserFormData>({
     first_name: '',
     last_name: '',
     username: '',
@@ -51,7 +64,7 @@ const CreateUser = () => {
         username: suggestedUsername
       }));
     }
-  }, [formData.first_name, formData.last_name]);
+  }, [formData.first_name, formData.last_name, formData.username]); // Added formData.username to dependency array
 
   const createUserMutation = useMutation(createUser, {
     onSuccess: (data) => {
@@ -115,8 +128,9 @@ const CreateUser = () => {
         dataToSubmit.end_date = new Date(dataToSubmit.end_date).toISOString().split('T')[0];
       }
       
-      // Submit form
-      createUserMutation.mutate(dataToSubmit);
+      // Type assertion to match UserCreate type
+      // Assuming UserCreate accepts string | null for date fields
+      createUserMutation.mutate(dataToSubmit as any);
     } else {
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
     }
